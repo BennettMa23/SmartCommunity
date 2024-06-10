@@ -3,21 +3,37 @@
     <div class="bg" />
     <div class="box">
       <div class="title">悦享智慧园区-登录</div>
-      <el-form ref="form" :model="formData" :rules="rules">
+      <!--
+        基础校验
+          el-form  :model="表单对象" :rules="规则对象"
+          el-form-item  prop属性指定一下要使用哪条规则
+          el-input  v-model双向绑定
+
+        统一校验
+          1. 获取表单的实例对象
+          2. 调用validate方法
+       -->
+      <el-form ref="form" :model="form" :rules="rules">
         <el-form-item label="账号" prop="username">
-          <el-input v-model="formData.username" />
+          <el-input v-model="form.username" />
         </el-form-item>
 
         <el-form-item label="密码" prop="password">
-          <el-input v-model="formData.password" />
+          <el-input v-model="form.password" />
+        </el-form-item>
+
+        <!--
+          1. 完成选择框的双向绑定 得到一个true或者false的选中状态
+          2. 如果当前为true，点击登录时，表示要记住，把当前的用户名和密码存入本地
+          3. 组件初始化的时候，从本地取账号和密码，把账号密码存入用来双向绑定的form身上
+          4. 如果当前用户没有记住，状态为false，点击登录的时候要把之前的数据清空
+         -->
+        <el-form-item prop="remember">
+          <el-checkbox v-model="remember">记住我</el-checkbox>
         </el-form-item>
 
         <el-form-item>
-          <el-checkbox v-model="formData.remember">记住我</el-checkbox>
-        </el-form-item>
-
-        <el-form-item>
-          <el-button type="primary" class="login_btn" @click="doLogin()">登录</el-button>
+          <el-button type="primary" class="login_btn" @click="loginHandler()">登录</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -25,32 +41,67 @@
 </template>
 
 <script>
+import { REMEMBER_KEY } from '@/constants/KEY'
 
+// import { loginAPI } from '@/api/user'
 export default {
   name: 'Login',
   data() {
     return {
-      formData: {
+      // 表单对象
+      form: {
         username: '',
-        password: '',
-        remember: false
+        password: ''
       },
+      remember: false,
+      // 规则对象
       rules: {
         username: [
-          { required: true, message: '请输入账号', trigger: 'blur' }
+          {
+            required: true,
+            message: '请输入账号',
+            trigger: 'blur'
+          }
         ],
         password: [
-          { required: true, message: '请输入密码', trigger: 'blur' }
+          {
+            required: true,
+            message: '请输入密码',
+            trigger: 'blur'
+          }
         ]
       }
     }
   },
+  created() {
+    // 去本地取一下之前存入的账号和密码 如果取到了 赋值操作
+    const formStr = localStorage.getItem(REMEMBER_KEY)
+    if (formStr) {
+      const formObj = JSON.parse(formStr)
+      this.form = formObj
+    }
+  },
   methods: {
-    doLogin() {
-      this.$refs.form.validate((valid) => {
+    loginHandler() {
+      this.$refs.form.validate(async valid => {
+        // 所有的表单项都通过校验 valid变量才为true 否则就是false
         if (valid) {
-          // TODO
-          console.log('登录')
+          // 添加记住我逻辑
+          if (this.remember) {
+            localStorage.setItem(REMEMBER_KEY, JSON.stringify(this.form))
+          } else {
+            localStorage.removeItem(REMEMBER_KEY)
+          }
+          // TODO LOGIN
+          // 这里确保token返回之后再跳转到首页 防止首页有一些需要依赖token的逻辑
+          await this.$store.dispatch('user/asyncLogin', this.form)
+          // 跳转到首页
+          this.$router.push('/')
+          // 提示用户登录成功
+          this.$message({
+            type: 'success',
+            message: '登录成功'
+          })
         }
       })
     }
