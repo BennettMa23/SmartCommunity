@@ -34,8 +34,8 @@ service.interceptors.response.use(
     // if (error.response.status === 401) {
     //   // 1. 跳转到登录
     // //   router.push('/login')
-    //   2. 清空用户数据
-    //   store.commit('user/clearUserInfo')
+    //   // 2. 清空用户数据
+    //   this.$store.commit('user/clearUserInfo')
     // }
     // 错误统一处理
     // 错误类型有可能有好多种 根据不同的错误码做不同的用户提示 写的位置都在这里
