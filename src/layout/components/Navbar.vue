@@ -27,7 +27,22 @@ export default {
   methods: {
     // 退出登录
     logout() {
-      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+      // 1. 询问用户
+      this.$confirm('确认要退出登录吗, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // 确认回调
+        // 1. 清空用户数据（vuex cookie）
+        this.$store.commit('user/clearUserInfo')
+        // 清空路由
+        this.$store.commit('menu/resetRouter')
+        // 2. 跳转到登录
+        this.$router.push('/login')
+      }).catch(() => {
+        // 取消或者.then中有错误
+      })
     }
   }
 }

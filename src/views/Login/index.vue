@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { REMEMBER_KEY } from '@/constants/KEY'
+import { REMEMBER_KEY, FORMDATA_KEY } from '@/constants/KEY'
 
 // import { loginAPI } from '@/api/user'
 export default {
@@ -79,6 +79,15 @@ export default {
     if (formStr) {
       const formObj = JSON.parse(formStr)
       this.form = formObj
+    }
+  },
+  mounted() {
+    const cacheFormStr = localStorage.getItem(FORMDATA_KEY)
+    if (cacheFormStr) {
+      const cacheFormData = JSON.parse(cacheFormStr)
+      this.form.username = cacheFormData.username
+      this.form.password = cacheFormData.password
+      this.form.remember = true
     }
   },
   methods: {

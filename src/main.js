@@ -18,6 +18,9 @@ Vue.use(ElementUI)
 
 Vue.config.productionTip = false
 
+// 添加权限控制初始化(直接把permmision.js中的代码立即执行)
+import './permission'
+
 // vue实例化
 new Vue({
   el: '#app',
@@ -25,3 +28,24 @@ new Vue({
   store,
   render: h => h(App)
 })
+
+// render: h => h(App)是ES6的写法，其实就是如下内容的简写：
+
+// render: function (createElement) {
+//      return createElement(App);
+// }
+
+// 进一步缩写为(ES6 语法)：
+
+// render (createElement) {
+//     return createElement(App);
+// }
+
+// 再进一步缩写为：
+// render (h){
+//     return h(App);
+// }
+
+// 按照 ES6 箭头函数的写法，就得到了：
+// render: h => h(App);
+// render函数是渲染一个视图，然后提供给el挂载，如果没有render那页面什么都不会出来
