@@ -1,5 +1,5 @@
 <script>
-import { getCardListAPI } from '@/api/card'
+import { getCardListAPI, delCardAPI, delCardListAPI } from '@/api/card'
 
 export default {
   data() {
@@ -29,7 +29,10 @@ export default {
           id: 1,
           name: '已过期'
         }
-      ]
+      ],
+      // 已选择列表
+      selectedCarList: [],
+      currentPage1: 5
     }
   },
   mounted() {
@@ -56,10 +59,65 @@ export default {
       // 使用最新的请求参数获取列表数据
       this.getCardList()
     },
+    handleSizeChange(pageSize) {
+      // 把点击的页数赋值给请求参数页数
+      this.params.pageSize = pageSize
+      // 使用最新的请求参数获取列表数据
+      this.getCardList()
+    },
     doSearch() {
       // 调用接口之前把页数参数重置为1
       this.params.page = 1
       this.getCardList()
+    },
+    editCard(id) {
+      console.log(id + '  --- ok')
+      this.$router.push({
+        path: '/addCard',
+        query: {
+          id
+        }
+      })
+    },
+    // 删除逻辑
+    delCard(id) {
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async() => {
+        // return
+        await delCardAPI(id)
+        this.getCardList()
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+      }).catch((error) => {
+        console.log(error)
+      })
+    },
+    handleSelectionChange(rowList) {
+      console.log(rowList)
+      this.selectedCarList = rowList
+    },
+    delCartList() {
+      this.$confirm('此操作将永久删除选择的月卡, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async() => {
+        // 处理id
+        // console.log(this.selectedCarList.map(item => item.id))
+        await delCardListAPI(this.selectedCarList.map(item => item.id))
+        this.getCardList()
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+      }).catch((error) => {
+        console.log(error)
+      })
     }
   }
 }
@@ -89,11 +147,16 @@ export default {
     <div class="create-container">
       <!-- <el-button type="primary" @click="$router.push('/cardAdd')">添加月卡</el-button> -->
       <el-button style="padding: 7px 15px;" type="primary" @click="$router.push('/addCard')">添加月卡</el-button>
-      <el-button style="padding: 7px 15px">批量删除</el-button>
+      <!-- <el-button style="padding: 7px 15px" @click="delCartList(handleSelectionChange)">批量删除</el-button> -->
+      <el-button style="padding: 7px 15px" @click="delCartList">批量删除</el-button>
     </div>
     <!-- 表格区域 -->
     <div class="table">
-      <el-table style="width: 100%" :data="cardList">
+      <el-table style="width: 100%" :data="cardList" @selection-change="handleSelectionChange">
+        <el-table-column
+          type="selection"
+          width="45"
+        />
         <el-table-column type="index" label="序号" />
         <el-table-column label="车主名称" prop="personName" />
         <el-table-column label="联系方式" prop="phoneNumber" />
@@ -136,11 +199,14 @@ export default {
          3. 把获取到的当前页的列表数据重新渲染table组件上
     -->
     <div class="page-container">
+      <!-- <span class="demonstration">显示总数</span> -->
       <el-pagination
-        layout="total, prev, pager, next"
+        layout="total, sizes, prev, pager, next, jumper"
         :page-size="params.pageSize"
         :total="total"
+        :page-sizes="[5, 3, 10, 50]"
         @current-change="currentChange"
+        @size-change="handleSizeChange"
       />
     </div>
     <!-- 添加楼宇 -->

@@ -2,6 +2,7 @@
   <div class="add-card">
     <header class="add-header">
       <el-page-header :content="id?'编辑月卡':'新增月卡'" @back="$router.back()" />
+      <!-- console.log(content) -->
     </header>
     <main class="add-main">
       <div class="form-container">
@@ -63,7 +64,7 @@
     </main>
     <footer class="add-footer">
       <div class="btn-container">
-        <el-button>重置</el-button>
+        <el-button @click="resetForm">重置</el-button>
         <el-button type="primary" @click="confirmAdd">确定</el-button>
       </div>
     </footer>
@@ -202,6 +203,7 @@ export default {
                 cardStartDate: this.feeForm.payTime[0],
                 cardEndDate: this.feeForm.payTime[1]
               }
+              // 删掉多余字段
               delete reqData.payTime
               console.log(reqData)
               // 调用接口需要区分是编辑还是新增
@@ -224,6 +226,7 @@ export default {
     },
     async getCardDetail() {
       const id = this.id
+      console.log('OK')
       const res = await getDetailAPI(id)
       // 第一个表单
       const { carInfoId, rechargeId, personName, phoneNumber, carNumber, carBrand } = res.data
@@ -233,6 +236,14 @@ export default {
       this.feeForm.payTime = [cardStartDate, cardEndDate]
       this.feeForm.paymentAmount = paymentAmount
       this.feeForm.paymentMethod = paymentMethod
+    },
+    // 重置表单
+    resetForm() {
+      // console.log(this.$refs.feeForm.resetFields)
+
+      this.$refs.feeForm.resetFields()
+      // console.log(this.$refs.feeForm.resetFields)
+      this.$refs.carInfoForm.resetFields()
     }
   }
 }
