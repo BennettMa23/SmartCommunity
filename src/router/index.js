@@ -23,6 +23,10 @@ export const routes = [
     redirect: '/workbench'
   },
   {
+    path: '/exterpriseAdd',
+    component: () => import('@/views/Park/Enterprise/add')
+  },
+  {
     path: '/workbench',
     component: Layout,
     children: [{
