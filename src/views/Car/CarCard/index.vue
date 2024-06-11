@@ -7,11 +7,29 @@ export default {
       // 请求参数
       params: {
         page: 1,
-        pageSize: 2
+        pageSize: 5,
+        carNumber: null,
+        personName: null,
+        cardStatus: null
       },
       total: 0,
       // 月卡列表
-      cardList: []
+      cardList: [],
+      // 月卡状态
+      cardStatusList: [
+        {
+          id: null,
+          name: '全部'
+        },
+        {
+          id: 0,
+          name: '可用'
+        },
+        {
+          id: 1,
+          name: '已过期'
+        }
+      ]
     }
   },
   mounted() {
@@ -37,6 +55,11 @@ export default {
       this.params.page = page
       // 使用最新的请求参数获取列表数据
       this.getCardList()
+    },
+    doSearch() {
+      // 调用接口之前把页数参数重置为1
+      this.params.page = 1
+      this.getCardList()
     }
   }
 }
@@ -48,19 +71,25 @@ export default {
     <!-- 搜索区域 -->
     <div class="search-container">
       <span class="search-label">车牌号码：</span>
-      <el-input clearable placeholder="请输入内容" class="search-main" />
+      <el-input v-model="params.carNumber" clearable placeholder="请输入内容" class="search-main" />
       <span class="search-label">车主姓名：</span>
-      <el-input clearable placeholder="请输入内容" class="search-main" />
+      <el-input v-model="params.personName" clearable placeholder="请输入内容" class="search-main" />
       <span class="search-label">状态：</span>
-      <el-select>
-        <el-option v-for="item in []" :key="item.id" />
+      <el-select v-model="params.cardStatus">
+        <el-option
+          v-for="item in cardStatusList"
+          :key="item.id"
+          :value="item.id"
+          :label="item.name"
+        />
       </el-select>
-      <el-button type="primary" class="search-btn">查询</el-button>
+      <el-button type="primary" class="search-btn" @click="doSearch">查询</el-button>
     </div>
     <!-- 新增删除操作区域 -->
     <div class="create-container">
-      <el-button type="primary">添加月卡</el-button>
-      <el-button>批量删除</el-button>
+      <!-- <el-button type="primary" @click="$router.push('/cardAdd')">添加月卡</el-button> -->
+      <el-button style="padding: 7px 15px;" type="primary" @click="$router.push('/addCard')">添加月卡</el-button>
+      <el-button style="padding: 7px 15px">批量删除</el-button>
     </div>
     <!-- 表格区域 -->
     <div class="table">
@@ -166,6 +195,19 @@ export default {
 .create-container {
   margin: 10px 0px;
 }
+// .create-container > div {
+//   /* 选择 .parent-class 内的所有直接子 <div> 元素 */
+//   padding: 8px 15px;
+// }
+// .parent-class div:first-child {
+//   /* 选择 .parent-class 内的第一个 <div> 元素 */
+// }
+// .parent-class p:last-child {
+//   /* 选择 .parent-class 内的最后一个 <p> 元素 */
+// }
+// .create-container-yue {
+//   padding: 10px 20px;
+// }
 
 .page-container {
   padding: 4px 0px;
