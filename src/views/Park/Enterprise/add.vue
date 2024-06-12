@@ -2,9 +2,12 @@
   <div class="add-enterprise">
     <header class="add-header">
       <div class="left">
-        <span class="arrow" @click="$router.back()"><i class="el-icon-arrow-left" />返回</span>
-        <span>|</span>
-        <span>添加企业</span>
+        <!-- <span class="arrow" @click="$router.back()"><i class="el-icon-arrow-left" />返回</span>
+        <span> | </span> -->
+        <el-page-header
+          :content="`${id?'编辑企业':'添加企业'}`"
+          @back="$router.back()"
+        />
       </div>
       <div class="right">
         管理员
@@ -64,7 +67,7 @@
 </template>
 
 <script>
-import { getIndustryListAPI, uploadAPI, createExterpriseAPI } from '@/api/enterprise'
+import { getIndustryListAPI, uploadAPI, createExterpriseAPI, getEnterpriseDetailAPI, updateExterpriseAPI } from '@/api/enterprise'
 export default {
   data() {
     const validatePhone = (rule, value, callback) => {
@@ -112,8 +115,20 @@ export default {
       }
     }
   },
+  computed: {
+    id() {
+      return this.$route.query.id
+    }
+  },
   mounted() {
+    // 模版的渲染会等待这个接口返回吗？
+    // 不是
+    // 首先会以data中默认的数据完成第一次渲染
+    // 等到接口数据返回之后 由于响应式数据的变化 视图会跟着一起变 完成二次渲染
     this.getIndustryList()
+    if (this.id) {
+      this.getEnterpriseDetail()
+    }
   },
   methods: {
     async getIndustryList() {
@@ -151,19 +166,39 @@ export default {
       if (!isLt5M) {
         this.$message.error('上传合同图片大小不能超过 5MB!')
       }
-      console.log(allowImgType + '#####' + isLt5M + '#####');
+      console.log(allowImgType + '#####' + isLt5M + '#####')
       return allowImgType && isLt5M
     },
     confirmSubmit() {
       this.$refs.ruleForm.validate(async valid => {
-        // console.log(valid)
-        if (!valid) return
-        // 1. 调用接口
-        await createExterpriseAPI(this.addForm)
-        // 2. 返回列表页
-        this.$router.back()
+        console.log(valid + '@@valid')
+        if (this.id) {
+          // console.log(this.addForm);
+          // 更新接口
+          const {
+            name, id, legalPerson, registeredAddress, industryCode, businessLicenseId,
+            businessLicenseUrl, contact, contactNumber
+          } = this.addForm
+          // 编辑
+          await updateExterpriseAPI({
+            name, id, legalPerson, registeredAddress, industryCode, businessLicenseId,
+            businessLicenseUrl, contact, contactNumber
+          })
+        } else {
+          // 新增
+          await createExterpriseAPI(this.addForm)
+        }
+        // console.log(this.addForm)
+        this.$router.back()// 2. 返回列表页
       })
+    },
+    async getEnterpriseDetail() {
+      const res = await getEnterpriseDetailAPI(this.id)
+      // const { businessLicenseId, businessLicenseUrl, contact, contactNumber, industryCode, legalPerson, name, registeredAddress } = res.data
+      // this.addForm = { businessLicenseId, businessLicenseUrl, contact, contactNumber, industryCode, legalPerson, name, registeredAddress }
+      this.addForm = res.data
     }
+
   }
 }
 </script>
