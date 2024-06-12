@@ -95,7 +95,7 @@ export default {
       employeeList: [],
       params: {
         page: 1,
-        pageSize: 2,
+        pageSize: 10,
         name: '' // 员工姓名
       },
       total: 0,

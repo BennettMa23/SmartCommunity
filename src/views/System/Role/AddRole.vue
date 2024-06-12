@@ -125,7 +125,7 @@ export default {
   },
   computed: {
     roleId() {
-      console.log(1);
+      console.log(1)
       return this.$route.query.roleId
     }
   },

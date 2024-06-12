@@ -1,4 +1,4 @@
-import { loginAPI } from '@/api/user'
+import { loginAPI, getProfileAPI } from '@/api/user'
 import { setToken, getToken, removeToken } from '@/utils/auth'
 
 export default {
@@ -32,14 +32,14 @@ export default {
       const res = await loginAPI({ username, password })
       // 2. 提交mutation
       ctx.commit('setToken', res.data.token)
+    },
+    async getUserProfile(ctx) {
+      const res = await getProfileAPI()
+      ctx.commit('setProfile', res.data)
+      // 这里如果想要当前函数内的数据给到另外一个js模块使用
+      // 直接把目标数据return出去
+      return res.data.permissions
     }
-    // async getUserProfile(ctx) {
-    //   const res = await getProfileAPI()
-    //   ctx.commit('setProfile', res.data)
-    //   // 这里如果想要当前函数内的数据给到另外一个js模块使用
-    //   // 直接把目标数据return出去
-    //   return res.data.permissions
-    // }
   }
   // getters: {
 
