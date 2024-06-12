@@ -3,6 +3,17 @@
     <div class="create-container">
       <el-button type="primary" @click="dialogVisible = true">增加停车计费规则</el-button>
       <el-button @click="exportToExcel">导出Excel</el-button>
+      <!-- <el-button
+        v-auth-btn="'park:building:add_sadit'"
+        type="primary"
+      >添加楼宇</el-button> -->
+      <!-- <auth-button btn-string="park:building:remove">
+        <el-button size="mini" type="text" @click="confirmDel(scope.row.id)">删除</el-button>
+      </auth-button>
+
+      <auth-button btn-string="park:building:add_edit">
+        <el-button type="primary" @click="addBuilding">添加楼宇</el-button>
+      </auth-button> -->
     </div>
     <!-- 表格区域 -->
     <div class="table">
@@ -84,6 +95,22 @@ import { utils, writeFileXLSX } from 'xlsx'
 
 export default {
   name: 'Building',
+  // props: {
+  //   btnString: {
+  //     type: String,
+  //     default: ''
+  //   }
+  // },
+  // computed: {
+  //   isShow() {
+  //     const perms = this.$store.state.user.profile.permissions
+  //     return perms.includes(this.btnString) || perms.includes('*:*:*')
+  //   }
+  // },
+  // render() {
+  //   // this.$slots.default拿到的就是要控制显示和隐藏的按钮组件
+  //   return this.isShow && this.$slots.default
+  // },
   data() {
     return {
       ruleList: [],

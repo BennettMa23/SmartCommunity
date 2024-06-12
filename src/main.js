@@ -13,13 +13,24 @@ import router from './router'
 
 // 注册svg
 import '@/icons'
-
+// 全局注册组件
 Vue.use(ElementUI)
 
+// 测试环境变化
+console.log('环境变量为:', process.env.VUE_APP_BASE_URL)
 Vue.config.productionTip = false
+
+// 注册自己的插件
+import componentPlugin from '@/components'
+Vue.use(componentPlugin)
+
+// 执行全局指令注册
+import './directive'
 
 // 添加权限控制初始化(直接把permmision.js中的代码立即执行)
 import './permission'
+
+// import './registerMicroApp'
 
 // vue实例化
 new Vue({
